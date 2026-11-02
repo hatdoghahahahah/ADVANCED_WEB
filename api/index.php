@@ -1,6 +1,6 @@
 <?php
 // I-require ang database connection (siguraduhing tama ang path ng db.php)
-require_once 'db.php';
+require_once __DIR__ . '/../db.php';
 
 // Kapag nag-submit ang Add Task (POST request)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

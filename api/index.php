@@ -154,6 +154,46 @@
         }
 
         .delete-btn:hover { background: #c82333; }
+        
+                /* --- RESPONSIVE DESIGN PARA SA PHONES AT TABLETS --- */
+        
+        /* Para sa mga Tablet (Screen width na 768px pababa) */
+        @media screen and (max-width: 768px) {
+          body {
+            padding: 10px;
+          }
+          
+          .container, .main-content, .card {
+            width: 100% !important;
+            margin: 0 auto;
+            padding: 15px;
+          }
+        
+          /* I-adjust ang mga tables o grid layout para hindi sumobra sa screen */
+          table {
+            display: block;
+            overflow-x: auto;
+            white-space: nowrap;
+          }
+        
+          input, select, button {
+            width: 100% !important;
+            margin-bottom: 8px;
+          }
+        }
+        
+        /* Para sa mga Cellphones / Mobile Phones (Screen width na 480px pababa) */
+        @media screen and (max-width: 480px) {
+          h1 {
+            font-size: 1.5rem;
+          }
+        
+          .btn, button {
+            padding: 10px;
+            font-size: 14px;
+          }
+        }
+        
     </style>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

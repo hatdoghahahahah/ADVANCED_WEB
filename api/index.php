@@ -250,114 +250,153 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </div>
 
 <script>
-    $(document).ready(function() {
-        let currentFilter = 'all';
+$(document).ready(function() {
+    let currentFilter = 'all';
 
-        function loadTasks() {
-            $.ajax({
-                url: 'index.php?action=fetch',
-                method: 'GET',
-                dataType: 'json',
-                success: function(data) {
-                    let output = '';
-                    let filteredData = data.filter(task => {
-                        if (currentFilter === 'all') return true;
-                        return task.status === currentFilter;
+    // Supabase REST API Configuration
+    const SUPABASE_URL = 'https://leceisjbzpeztomdgcyb.supabase.co/rest/v1/tasks';
+    const SUPABASE_KEY = 'sb_publishable_-vOJDJSgrgEt5mnmPe4Qvg_0XeA7WHt'; // Siguraduhing tama ang iyong publishable key dito kung sakaling may bago
+
+    // 1. LOAD TASKS (GET)
+    function loadTasks() {
+        $.ajax({
+            url: SUPABASE_URL + '?select=*&order=id.desc',
+            method: 'GET',
+            headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': 'Bearer ' + SUPABASE_KEY
+            },
+            dataType: 'json',
+            success: function(data) {
+                let output = '';
+                let filteredData = data.filter(task => {
+                    if (currentFilter === 'all') return true;
+                    return task.status === currentFilter;
+                });
+
+                if(filteredData.length === 0) {
+                    output = '<li style="text-align:center; color:#888;">No tasks found.</li>';
+                } else {
+                    $.each(filteredData, function(index, task) {
+                        let checked = task.status === 'Completed' ? 'checked' : '';
+                        let completedClass = task.status === 'Completed' ? 'completed' : '';
+
+                        output += `<li class="${completedClass}">
+                            <div class="task-left">
+                                <input type="checkbox" class="toggle-status" data-id="${task.id}" data-status="${task.status}" ${checked}>
+                                <span class="task-text">${task.task_name}</span>
+                                <span class="badge badge-${task.priority}">${task.priority}</span>
+                            </div>
+                            <button class="delete-btn" data-id="${task.id}">Delete</button>
+                        </li>`;
                     });
-
-                    if(filteredData.length === 0) {
-                        output = '<li style="text-align:center; color:#888;">No tasks found.</li>';
-                    } else {
-                        $.each(filteredData, function(index, task) {
-                            let checked = task.status === 'Completed' ? 'checked' : '';
-                            let completedClass = task.status === 'Completed' ? 'completed' : '';
-
-                            output += `<li class="${completedClass}">
-                                <div class="task-left">
-                                    <input type="checkbox" class="toggle-status" data-id="${task.id}" data-status="${task.status}" ${checked}>
-                                    <span class="task-text">${task.task_name}</span>
-                                    <span class="badge badge-${task.priority}">${task.priority}</span>
-                                </div>
-                                <button class="delete-btn" data-id="${task.id}">Delete</button>
-                            </li>`;
-                        });
-                    }
-                    $('#taskList').html(output);
                 }
-            });
+                $('#taskList').html(output);
+            },
+            error: function(xhr) {
+                console.error('Error loading tasks:', xhr.responseText);
+            }
+        });
+    }
+
+    // Tawagin pagka-load ng pahina
+    loadTasks();
+
+    // 2. ADD TASK (POST)
+    $('#addTaskBtn').click(function() {
+        let taskName = $('#taskInput').val();
+        let priority = $('#priorityInput').val() || 'Medium';
+
+        if(taskName.trim() === '') {
+            alert('Please enter a task name!');
+            return;
         }
 
-        loadTasks();
-
-        $('#addTaskBtn').click(function() {
-            let taskName = $('#taskInput').val();
-            let priority = $('#priorityInput').val();
-
-            if(taskName.trim() === '') {
-                alert('Please enter a task name!');
-                return;
+        $.ajax({
+            url: SUPABASE_URL,
+            method: 'POST',
+            headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': 'Bearer ' + SUPABASE_KEY,
+                'Content-Type': 'application/json',
+                'Prefer': 'return=minimal'
+            },
+            data: JSON.stringify({
+                task_name: taskName,
+                priority: priority,
+                status: 'Pending'
+            }),
+            success: function() {
+                $('#taskInput').val('');
+                loadTasks();
+            },
+            error: function(xhr) {
+                alert('Error adding task: ' + xhr.responseText);
             }
-
-            $.ajax({
-                url: 'backend.php',
-                method: 'POST',
-                data: { action: 'add', task_name: taskName, priority: priority },
-                dataType: 'json',
-                success: function(response) {
-                    if(response.success) {
-                        $('#taskInput').val('');
-                        loadTasks();
-                    } else {
-                        alert(response.message);
-                    }
-                }
-            });
-        });
-
-        $(document).on('change', '.toggle-status', function() {
-            let taskId = $(this).data('id');
-            let currentStatus = $(this).data('status');
-
-            $.ajax({
-                url: 'backend.php',
-                method: 'POST',
-                data: { action: 'toggle', id: taskId, status: currentStatus },
-                dataType: 'json',
-                success: function(response) {
-                    if(response.success) {
-                        loadTasks();
-                    }
-                }
-            });
-        });
-
-        $(document).on('click', '.delete-btn', function() {
-            let taskId = $(this).data('id');
-
-            $.ajax({
-                url: 'backend.php',
-                method: 'POST',
-                data: { action: 'delete', id: taskId },
-                dataType: 'json',
-                success: function(response) {
-                    if(response.success) {
-                        loadTasks();
-                    }
-                }
-            });
-        });
-
-        $('.filter-btn').click(function() {
-            $('.filter-btn').removeClass('active');
-            $(this).addClass('active');
-            currentFilter = $(this).data('filter');
-            loadTasks();
-        });
-
-        $('#themeToggle').click(function() {
-            $('body').toggleClass('dark-mode');
         });
     });
+
+    // 3. TOGGLE STATUS (PATCH)
+    $(document).on('change', '.toggle-status', function() {
+        let taskId = $(this).data('id');
+        let currentStatus = $(this).data('status');
+        let newStatus = currentStatus === 'Completed' ? 'Pending' : 'Completed';
+
+        $.ajax({
+            url: SUPABASE_URL + '?id=eq.' + taskId,
+            method: 'PATCH',
+            headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': 'Bearer ' + SUPABASE_KEY,
+                'Content-Type': 'application/json',
+                'Prefer': 'return=minimal'
+            },
+            data: JSON.stringify({
+                status: newStatus
+            }),
+            success: function() {
+                loadTasks();
+            },
+            error: function(xhr) {
+                alert('Error updating status: ' + xhr.responseText);
+            }
+        });
+    });
+
+    // 4. DELETE TASK (DELETE)
+    $(document).on('click', '.delete-btn', function() {
+        let taskId = $(this).data('id');
+
+        $.ajax({
+            url: SUPABASE_URL + '?id=eq.' + taskId,
+            method: 'DELETE',
+            headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': 'Bearer ' + SUPABASE_KEY,
+                'Prefer': 'return=minimal'
+            },
+            success: function() {
+                loadTasks();
+            },
+            error: function(xhr) {
+                alert('Error deleting task: ' + xhr.responseText);
+            }
+        });
+    });
+
+    // 5. FILTER BUTTONS
+    $('.filter-btn').click(function() {
+        $('.filter-btn').removeClass('active');
+        $(this).addClass('active');
+        currentFilter = $(this).data('filter');
+        loadTasks();
+    });
+
+    // 6. THEME TOGGLE
+    $('#themeToggle').click(function() {
+        $('body').toggleClass('dark-mode');
+    });
+});
 </script>
 
 </body>

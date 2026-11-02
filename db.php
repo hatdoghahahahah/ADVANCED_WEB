@@ -5,7 +5,6 @@ $db   = 'postgres';
 $user = 'postgres.leceisjbzpeztomdgcyb';
 $pass = 'olaabdiel123';
 
-// Pilitin ang IPv4 sa pamamagitan ng pag-resolba ng host o paggamit ng direct parameters
 $dsn = "pgsql:host=$host;port=$port;dbname=$db;sslmode=require";
 
 try {

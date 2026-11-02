@@ -1,33 +1,3 @@
-<?php
-// I-require ang database connection (siguraduhing tama ang path ng db.php)
-require_once __DIR__ . '/../db.php';
-
-// Kapag nag-submit ang Add Task (POST request)
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Linisin at kunin ang data mula sa AJAX request
-    $task = $_POST['task'] ?? '';
-    $priority = $_POST['priority'] ?? 'Medium';
-    
-    // I-set ang header na JSON ang isasabing response
-    header('Content-Type: application/json');
-
-    try {
-        // Halimbawa ng query para i-save sa database (palitan depende sa table name niyo)
-        $stmt = $pdo->prepare("INSERT INTO tasks (task, priority, status) VALUES (?, ?, 'pending')");
-        $stmt->execute([$task, $priority]);
-
-        // Magbalik ng JSON success response
-        echo json_encode(['success' => true]);
-    } catch (Exception $e) {
-        // Magbalik ng JSON error kung sakaling pumalya
-        echo json_encode(['success' => false, 'error' => $e->getMessage()]);
-    }
-    
-    // Napakahalaga: I-exit dito para hindi na mabasa ng server ang sumusunod na HTML code
-    exit;
-}
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>

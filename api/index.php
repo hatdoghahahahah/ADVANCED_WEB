@@ -155,9 +155,7 @@
 
         .delete-btn:hover { background: #c82333; }
         
-                /* --- RESPONSIVE DESIGN PARA SA PHONES AT TABLETS --- */
-        
-        /* Para sa mga Tablet (Screen width na 768px pababa) */
+
         @media screen and (max-width: 768px) {
           body {
             padding: 10px;
@@ -169,16 +167,16 @@
             padding: 15px;
           }
         
-          /* I-adjust ang mga tables o grid layout para hindi sumobra sa screen */
+
           table {
             display: block;
             overflow-x: auto;
             white-space: nowrap;
           }
         
-        /* Palakihin at gawing full-width ang search bar kapag nasa phone */
+     
         @media screen and (max-width: 768px) {
-          /* Palitan ang selector kung ano man ang class o ID ng search input niyo (hal. #search o .search-input) */
+       
           input[type="text"], input[type="search"], .search-bar, input.form-control {
             width: 100% !important;
             max-width: 100% !important;
@@ -225,7 +223,7 @@ $(document).ready(function() {
 
     // Supabase REST API Configuration
     const SUPABASE_URL = 'https://leceisjbzpeztomdgcyb.supabase.co/rest/v1/tasks';
-    const SUPABASE_KEY = 'sb_publishable_-vOJDJSgrgEt5mnmPe4Qvg_0XeA7WHt'; // Siguraduhing tama ang iyong publishable key dito kung sakaling may bago
+    const SUPABASE_KEY = 'sb_publishable_-vOJDJSgrgEt5mnmPe4Qvg_0XeA7WHt'; 
 
     // 1. LOAD TASKS (GET)
     function loadTasks() {
@@ -269,7 +267,7 @@ $(document).ready(function() {
         });
     }
 
-    // Tawagin pagka-load ng pahina
+ 
     loadTasks();
 
     // 2. ADD TASK (POST)

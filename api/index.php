@@ -193,6 +193,17 @@
             font-size: 14px;
           }
         }
+
+                /* Palakihin at gawing full-width ang search bar kapag nasa phone */
+        @media screen and (max-width: 768px) {
+          /* Palitan ang selector kung ano man ang class o ID ng search input niyo (hal. #search o .search-input) */
+          input[type="text"], input[type="search"], .search-bar, input.form-control {
+            width: 100% !important;
+            max-width: 100% !important;
+            display: block !important;
+            margin-bottom: 10px !important;
+          }
+        }
         
     </style>
 
